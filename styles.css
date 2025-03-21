@@ -1,0 +1,71 @@
+/* Importation d'une belle police */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+:root {
+    --background-light: #f4f4f4;
+    --background-dark: #1e1e1e;
+    --text-light: #333;
+    --text-dark: #f4f4f4;
+    --primary-color: #ff5733;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    text-align: center;
+    background: var(--background-light);
+    color: var(--text-light);
+    transition: background 0.3s, color 0.3s;
+}
+
+.dark-mode {
+    background: var(--background-dark);
+    color: var(--text-dark);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+button {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+button:hover {
+    background: #e74c3c;
+}
+
+.picker-section {
+    margin: 20px auto;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 10px;
+    width: 50%;
+}
+
+input[type="color"] {
+    width: 100px;
+    height: 100px;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+
+.color-values {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.info-section {
+    max-width: 600px;
+    margin: auto;
+    padding: 20px;
+    text-align: left;
+}

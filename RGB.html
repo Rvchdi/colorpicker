@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker Interactif</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: #4a4a4a;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+            }
+        }
+        
+        .color-picker-section {
+            flex: 1;
+            padding: 20px;
+            border-right: 1px solid #eee;
+        }
+        
+        .color-info-section {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .color-display {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+        
+        .color-input-container {
+            margin-bottom: 20px;
+        }
+        
+        .color-input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .color-input-row label {
+            width: 80px;
+            font-weight: bold;
+        }
+        
+        .color-input-row input[type="range"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+        
+        .color-input-row input[type="number"] {
+            width: 60px;
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .color-values {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .color-value {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .color-value-text {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .copy-btn {
+            background-color: #4a4a4a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: background-color 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background-color: #333;
+        }
+        
+        .color-picker-direct {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .color-picker-direct input[type="color"] {
+            width: 80px;
+            height: 80px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .model-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+        }
+        
+        .model-section h3 {
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .model-section p {
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+        
+        .predefined-colors {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .predefined-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            transition: transform 0.2s;
+        }
+        
+        .predefined-color:hover {
+            transform: scale(1.1);
+        }
+        
+        .tab-container {
+            margin-top: 20px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 2px solid #ddd;
+        }
+        
+        .tab-button {
+            padding: 10px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            color: #777;
+        }
+        
+        .tab-button.active {
+            color: #4a4a4a;
+            border-bottom: 2px solid #4a4a4a;
+            margin-bottom: -2px;
+        }
+        
+        .tab-content {
+            padding: 20px 0;
+        }
+        
+        .tab-pane {
+            display: none;
+        }
+        
+        .tab-pane.active {
+            display: block;
+        }
+        
+        footer {
+            background-color: #4a4a4a;
+            color: white;
+            text-align: center;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Color Picker Interactif</h1>
+            <p>Explorez les couleurs et apprenez les différents modèles de couleurs</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="color-picker-section">
+                <div class="color-display" id="colorDisplay">
+                    Couleur actuelle
+                </div>
+                
+                <div class="color-input-container">
+                    <div class="color-input-row">
+                        <label for="redRange">Rouge (R):</label>
+                        <input type="range" id="redRange" min="0" max="255" value="255">
+                        <input type="number" id="redValue" min="0" max="255" value="255">
+                    </div>
+                    
+                    <div class="color-input-row">
+                        <label for="greenRange">Vert (G):</label>
+                        <input type="range" id="greenRange" min="0" max="255" value="0">
+                        <input type="number" id="greenValue" min="0" max="255" value="0">
+                    </div>
+                    
+                    <div class="color-input-row">
+                        <label for="blueRange">Bleu (B):</label>
+                        <input type="range" id="blueRange" min="0" max="255" value="0">
+                        <input type="number" id="blueValue" min="0" max="255" value="0">
+                    </div>
+                </div>
+                
+                <div class="color-values">
+                    <div class="color-value">
+                        <span class="color-value-text">RGB:</span>
+                        <span id="rgbValue">rgb(255, 0, 0)</span>
+                        <button class="copy-btn" data-value="rgb">Copier</button>
+                    </div>
+                    
+                    <div class="color-value">
+                        <span class="color-value-text">HEX:</span>
+                        <span id="hexValue">#FF0000</span>
+                        <button class="copy-btn" data-value="hex">Copier</button>
+                    </div>
+                    
+                    <div class="color-value">
+                        <span class="color-value-text">HSL:</span>
+                        <span id="hslValue">hsl(0, 100%, 50%)</span>
+                        <button class="copy-btn" data-value="hsl">Copier</button>
+                    </div>
+                </div>
+                
+                <div class="color-picker-direct">
+                    <p>Ou choisissez directement une couleur :</p>
+                    <input type="color" id="colorPicker" value="#ff0000">
+                </div>
+                
+                <div class="predefined-colors">
+                    <div class="predefined-color" style="background-color: #ff0000;" data-color="#ff0000" title="Rouge"></div>
+                    <div class="predefined-color" style="background-color: #00ff00;" data-color="#00ff00" title="Vert"></div>
+                    <div class="predefined-color" style="background-color: #0000ff;" data-color="#0000ff" title="Bleu"></div>
+                    <div class="predefined-color" style="background-color: #ffff00;" data-color="#ffff00" title="Jaune"></div>
+                    <div class="predefined-color" style="background-color: #ff00ff;" data-color="#ff00ff" title="Magenta"></div>
+                    <div class="predefined-color" style="background-color: #00ffff;" data-color="#00ffff" title="Cyan"></div>
+                    <div class="predefined-color" style="background-color: #ffffff;" data-color="#ffffff" title="Blanc"></div>
+                    <div class="predefined-color" style="background-color: #000000;" data-color="#000000" title="Noir"></div>
+                </div>
+            </div>
+            
+            <div class="color-info-section">
+                <h2>Les Modèles de Couleurs</h2>
+                
+                <div class="tab-container">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" data-tab="rgb">RGB</button>
+                        <button class="tab-button" data-tab="hex">HEX</button>
+                        <button class="tab-button" data-tab="hsl">HSL</button>
+                        <button class="tab-button" data-tab="cmyk">CMYK</button>
+                    </div>
+                    
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="rgb-tab">
+                            <div class="model-section">
+                                <h3>Le modèle RGB (Red, Green, Blue)</h3>
+                                <p>Le modèle RGB est un système additif dans lequel le rouge, le vert et le bleu sont combinés de différentes manières pour créer un large éventail de couleurs.</p>
+                                <p>Chaque composante (R, G, B) peut prendre une valeur de 0 à 255, où 0 signifie aucune contribution de cette couleur et 255 signifie la contribution maximale.</p>
+                                <p><strong>Exemples :</strong></p>
+                                <ul>
+                                    <li><strong>rgb(255, 0, 0)</strong> - Rouge pur</li>
+                                    <li><strong>rgb(0, 255, 0)</strong> - Vert pur</li>
+                                    <li><strong>rgb(0, 0, 255)</strong> - Bleu pur</li>
+                                    <li><strong>rgb(255, 255, 255)</strong> - Blanc</li>
+                                    <li><strong>rgb(0, 0, 0)</strong> - Noir</li>
+                                    <li><strong>rgb(255, 255, 0)</strong> - Jaune</li>
+                                </ul>
+                                <p>Le modèle RGB est principalement utilisé pour les écrans, les téléviseurs et tous les appareils qui émettent de la lumière.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane" id="hex-tab">
+                            <div class="model-section">
+                                <h3>Le modèle HEX (Hexadécimal)</h3>
+                                <p>Le modèle HEX est une représentation des couleurs RGB en notation hexadécimale (base 16).</p>
+                                <p>Un code couleur HEX commence par un dièse (#) suivi de 6 chiffres hexadécimaux, où :</p>
+                                <ul>
+                                    <li>Les deux premiers chiffres représentent le rouge (00-FF)</li>
+                                    <li>Les deux chiffres du milieu représentent le vert (00-FF)</li>
+                                    <li>Les deux derniers chiffres représentent le bleu (00-FF)</li>
+                                </ul>
+                                <p><strong>Exemples :</strong></p>
+                                <ul>
+                                    <li><strong>#FF0000</strong> - Rouge pur (255, 0, 0 en RGB)</li>
+                                    <li><strong>#00FF00</strong> - Vert pur (0, 255, 0 en RGB)</li>
+                                    <li><strong>#0000FF</strong> - Bleu pur (0, 0, 255 en RGB)</li>
+                                    <li><strong>#FFFFFF</strong> - Blanc (255, 255, 255 en RGB)</li>
+                                    <li><strong>#000000</strong> - Noir (0, 0, 0 en RGB)</li>
+                                </ul>
+                                <p>Le code HEX est largement utilisé en développement web (CSS, HTML) pour spécifier les couleurs.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane" id="hsl-tab">
+                            <div class="model-section">
+                                <h3>Le modèle HSL (Hue, Saturation, Lightness)</h3>
+                                <p>Le modèle HSL est une représentation plus intuitive des couleurs, basée sur :</p>
+                                <ul>
+                                    <li><strong>Teinte (Hue)</strong> : la couleur pure, exprimée en degrés de 0° à 360° sur le cercle chromatique (0° ou 360° = rouge, 120° = vert, 240° = bleu)</li>
+                                    <li><strong>Saturation</strong> : l'intensité ou pureté de la couleur, exprimée en pourcentage (0% = gris, 100% = couleur pure)</li>
+                                    <li><strong>Luminosité (Lightness)</strong> : la luminosité de la couleur, exprimée en pourcentage (0% = noir, 100% = blanc, 50% = couleur normale)</li>
+                                </ul>
+                                <p><strong>Exemples :</strong></p>
+                                <ul>
+                                    <li><strong>hsl(0, 100%, 50%)</strong> - Rouge</li>
+                                    <li><strong>hsl(120, 100%, 50%)</strong> - Vert</li>
+                                    <li><strong>hsl(240, 100%, 50%)</strong> - Bleu</li>
+                                    <li><strong>hsl(0, 0%, 100%)</strong> - Blanc</li>
+                                    <li><strong>hsl(0, 0%, 0%)</strong> - Noir</li>
+                                </ul>
+                                <p>Le modèle HSL est particulièrement utile lorsqu'on souhaite ajuster facilement la luminosité ou la saturation d'une couleur sans changer sa teinte.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="tab-pane" id="cmyk-tab">
+                            <div class="model-section">
+                                <h3>Le modèle CMYK (Cyan, Magenta, Yellow, Key/Black)</h3>
+                                <p>Le modèle CMYK est un système soustractif utilisé principalement pour l'impression.</p>
+                                <p>Contrairement au RGB qui ajoute de la lumière, le CMYK fonctionne en absorbant (soustrayant) la lumière :</p>
+                                <ul>
+                                    <li><strong>Cyan (C)</strong> : absorbe la couleur rouge</li>
+                                    <li><strong>Magenta (M)</strong> : absorbe la couleur verte</li>
+                                    <li><strong>Jaune (Y)</strong> : absorbe la couleur bleue</li>
+                                    <li><strong>Noir (K)</strong> : utilisé pour améliorer la profondeur des ombres et économiser de l'encre</li>
+                                </ul>
+                                <p>Chaque composante est exprimée en pourcentage de 0% à 100%.</p>
+                                <p><strong>Exemples :</strong></p>
+                                <ul>
+                                    <li><strong>cmyk(0%, 100%, 100%, 0%)</strong> - Rouge</li>
+                                    <li><strong>cmyk(100%, 0%, 100%, 0%)</strong> - Vert</li>
+                                    <li><strong>cmyk(100%, 100%, 0%, 0%)</strong> - Bleu</li>
+                                    <li><strong>cmyk(0%, 0%, 0%, 0%)</strong> - Blanc (pas d'encre)</li>
+                                    <li><strong>cmyk(0%, 0%, 0%, 100%)</strong> - Noir</li>
+                                </ul>
+                                <p>Le CMYK est principalement utilisé dans l'industrie de l'impression pour les magazines, affiches, brochures, etc.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Color Picker Interactif - Créé avec HTML, CSS et JavaScript</p>
+        </footer>
+    </div>
+    
+    <script>
+        // Éléments du DOM
+        const colorDisplay = document.getElementById('colorDisplay');
+        const redRange = document.getElementById('redRange');
+        const greenRange = document.getElementById('greenRange');
+        const blueRange = document.getElementById('blueRange');
+        const redValue = document.getElementById('redValue');
+        const greenValue = document.getElementById('greenValue');
+        const blueValue = document.getElementById('blueValue');
+        const rgbValue = document.getElementById('rgbValue');
+        const hexValue = document.getElementById('hexValue');
+        const hslValue = document.getElementById('hslValue');
+        const colorPicker = document.getElementById('colorPicker');
+        const copyButtons = document.querySelectorAll('.copy-btn');
+        const predefinedColors = document.querySelectorAll('.predefined-color');
+        const tabButtons = document.querySelectorAll('.tab-button');
+        
+        // Fonction pour mettre à jour l'affichage des couleurs
+        function updateColor() {
+            const r = parseInt(redRange.value);
+            const g = parseInt(greenRange.value);
+            const b = parseInt(blueRange.value);
+            
+            // Mettre à jour l'affichage de la couleur
+            const rgbColor = `rgb(${r}, ${g}, ${b})`;
+            colorDisplay.style.backgroundColor = rgbColor;
+            
+            // Calculer la luminosité pour déterminer la couleur du texte
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            colorDisplay.style.color = brightness > 128 ? 'black' : 'white';
+            
+            // Mettre à jour les valeurs textuelles
+            rgbValue.textContent = rgbColor;
+            
+            // Calculer et mettre à jour la valeur HEX
+            const hexColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`.toUpperCase();
+            hexValue.textContent = hexColor;
+            colorPicker.value = hexColor;
+            
+            // Calculer et mettre à jour la valeur HSL
+            const hsl = rgbToHsl(r, g, b);
+            hslValue.textContent = `hsl(${Math.round(hsl.h)}°, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`;
+        }
+        
+        // Fonction pour convertir RGB en HSL
+        function rgbToHsl(r, g, b) {
+            r /= 255;
+            g /= 255;
+            b /= 255;
+            
+            const max = Math.max(r, g, b);
+            const min = Math.min(r, g, b);
+            let h, s, l = (max + min) / 2;
+            
+            if (max === min) {
+                h = s = 0; // achromatic
+            } else {
+                const d = max - min;
+                s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+                
+                switch (max) {
+                    case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                    case g: h = (b - r) / d + 2; break;
+                    case b: h = (r - g) / d + 4; break;
+                }
+                
+                h /= 6;
+            }
+            
+            return {
+                h: h * 360,
+                s: s * 100,
+                l: l * 100
+            };
+        }
+        
+        // Fonction pour convertir HEX en RGB
+        function hexToRgb(hex) {
+            // Enlever le # si présent
+            hex = hex.replace(/^#/, '');
+            
+            // Analyser les composantes
+            const bigint = parseInt(hex, 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            
+            return { r, g, b };
+        }
+        
+        // Événements pour les sliders
+        redRange.addEventListener('input', function() {
+            redValue.value = this.value;
+            updateColor();
+        });
+        
+        greenRange.addEventListener('input', function() {
+            greenValue.value = this.value;
+            updateColor();
+        });
+        
+        blueRange.addEventListener('input', function() {
+            blueValue.value = this.value;
+            updateColor();
+        });
+        
+        // Événements pour les inputs numériques
+        redValue.addEventListener('input', function() {
+            if (this.value > 255) this.value = 255;
+            if (this.value < 0) this.value = 0;
+            redRange.value = this.value;
+            updateColor();
+        });
+        
+        greenValue.addEventListener('input', function() {
+            if (this.value > 255) this.value = 255;
+            if (this.value < 0) this.value = 0;
+            greenRange.value = this.value;
+            updateColor();
+        });
+        
+        blueValue.addEventListener('input', function() {
+            if (this.value > 255) this.value = 255;
+            if (this.value < 0) this.value = 0;
+            blueRange.value = this.value;
+            updateColor();
+        });
+        
+        // Événement pour le color picker direct
+        colorPicker.addEventListener('input', function() {
+            const rgb = hexToRgb(this.value);
+            
+            redRange.value = rgb.r;
+            greenRange.value = rgb.g;
+            blueRange.value = rgb.b;
+            
+            redValue.value = rgb.r;
+            greenValue.value = rgb.g;
+            blueValue.value = rgb.b;
+            
+            updateColor();
+        });
+        
+        // Événements pour les boutons de copie
+        copyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const type = this.getAttribute('data-value');
+                let textToCopy;
+                
+                switch (type) {
+                    case 'rgb':
+                        textToCopy = rgbValue.textContent;
+                        break;
+                    case 'hex':
+                        textToCopy = hexValue.textContent;
+                        break;
+                    case 'hsl':
+                        textToCopy = hslValue.textContent;
+                        break;
+                    default:
+                        textToCopy = '';
+                }
+                
+                // Copier dans le presse-papiers
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    // Afficher un retour visuel
+                    const originalText = this.textContent;
+                    this.textContent = 'Copié!';
+                    setTimeout(() => {
+                        this.textContent = originalText;
+                    }, 1500);
+                });
+            });
+        });
+        
+        // Événements pour les couleurs prédéfinies
+        predefinedColors.forEach(color => {
+            color.addEventListener('click', function() {
+                const hexColor = this.getAttribute('data-color');
+                colorPicker.value = hexColor;
+                
+                // Déclencher l'événement input pour mettre à jour les valeurs
+                const event = new Event('input');
+                colorPicker.dispatchEvent(event);
+            });
+        });
+        
+        // Gestionnaire d'onglets
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Désactiver tous les onglets
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                const tabPanes = document.querySelectorAll('.tab-pane');
+                tabPanes.forEach(pane => pane.classList.remove('active'));
+                
+                // Activer l'onglet cliqué
+                this.classList.add('active');
+                const tabId = this.getAttribute('data-tab');
+                document.getElementById(`${tabId}-tab`).classList.add('active');
+            });
+        });
+        
+        // Initialiser l'affichage
+        updateColor();
+    </script>
+</body>
+</html>
